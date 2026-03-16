@@ -10,3 +10,23 @@ class Nave:
         super().__init__(IdCombate, Clave)
         self.Nombre = Nombre
         self.PiezasRepuesto = PiezasRepuesto
+
+class EstacionEstelar:
+    
+    def __init__(self, IdCombate: str, Clave: int, Nombre: str, PiezasRepuesto: list,  Tripulacion: int, Pasaje: int): # faltan las enumeraciones.
+        super().__init__(IdCombate, Clave, Nombre, PiezasRepuesto)
+        self.Tripulacion = Tripulacion
+        self.Pasaje = Pasaje
+
+class NaveEstelar:
+
+    def __init__(self, IdCombate: str, Clave: int, Nombre: str, PiezasRepuesto: list, Tripulacion: int, Pasaje: int):
+        super().__init__(IdCombate, Clave, Nombre, PiezasRepuesto)
+        self.Tripulacion = Tripulacion
+        self.Pasaje = Pasaje
+
+class CazaEstelar:
+
+    def __init__(self, IdCombate: str, Clave: int, Nombre: str, PiezasRepuesto: list, Dotacion: int):
+        super().__init__(IdCombate, Clave, Nombre, PiezasRepuesto)
+        self.Dotacion = Dotacion
