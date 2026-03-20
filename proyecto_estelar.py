@@ -66,7 +66,10 @@ class UsuarioSistema:
         
 class Comandante(UsuarioSistema):
     ''' 
-    En nuestro gestor de mantenimiento de la flota, el Comandante será el encargado de gestionar su nave, por tanto él será el único que conozca las piezas que necesita así pues, sugre la necesidad de poder conocer el precio, stock disponible de un repuesto concreto, así como la posibilidad de comprar dicho repuesto. El Comandante a la hora de adqurir una pieza, no se preocupa del almacen en el que se encuentra la pieza, simplemente si la pieza está o no, sin importar donde se encuentre.
+    En nuestro gestor de mantenimiento de la flota, el Comandante será el encargado de gestionar su nave, por tanto él será el único 
+    que conozca las piezas que necesita así pues, sugre la necesidad de poder conocer el precio, stock disponible de un repuesto 
+    concreto, así como la posibilidad de comprar dicho repuesto. El Comandante a la hora de adqurir una pieza, no se preocupa del 
+    almacen en el que se encuentra la pieza, simplemente si la pieza está o no, sin importar donde se encuentre.
     
     Así por tanto, una vez tenga la pieza adquirida esta se adjuntará a su propia nave, puede que se instale o simplemente este a modo de reserva.
     '''
@@ -98,8 +101,35 @@ class Comandante(UsuarioSistema):
                     
                     nuevo_stock = repuesto.get_cantidad() - cantidad
                     repuesto.set_cantidad(nuevo_stock) # definir método set
-                    self.nave_asignada.piezas_repuesto.append(nombre_pieza)
+                    self.nave_asignada.piezas_repuesto.append(nombre_pieza) # añadimos el repuesto a la nave del comandante.
                     return True
         return False
                     
+class Operario(UsuarioSistema):
+    '''
+    En nuestro software gestor contratado por el Imperio Galáctico, la función de los operarios será el mantenimiento de los 
+    almacenes que se encuentran por la galaxia. Un operario esta ligado a un almacen, su objetivo será dada una entrada de repuestos
+    que le lleguen 'ordenarlos' en el catálogo del almacen. No obstate, también se pueden dar otras situaciones como que llegue un 
+    nuevo modelo de un repuesto y el operario decida descatalogar el modelo antiguo. 
+    '''
+    
+    def __init__(self, id_usuario : str, clave_usuario : int, almacen_asignado : str):
+        super().__init__(id_usuario, clave_usuario)
         
+        self.almacen_asignado = almacen_asignado
+        
+    def añadir_repuesto(self, nombre_repuesto : str) :
+        ''' Añadimos un nuevo repuesto'''
+        self.almacen_asignado.catalogo_repuestos.append(nombre_repuesto)
+        
+    def eliminar_repuesto(self, nombre_repuesto : str):
+        '''Eliminamos repuesto'''
+        self.almacen_asignado.catalogo_repuestos.remove(nombre_repuesto)
+        
+    def modificar_stock(self, nombre_repuesto : str, nueva_cantidad : int):
+        '''Dado un repuesto modificamos el stock'''
+        for repuesto in self.almacen_asignado.catalogo_repuestos:
+            if repuesto == nombre_repuesto:
+                repuesto.set_cantidad(nueva_cantidad) # definir metodo set
+        
+    
