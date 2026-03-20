@@ -13,35 +13,53 @@ class EClase(Enum):
 
 class UnidadesCombateEstelares:
 
-    def __init__(self, IdCombate: str, Clave: int):
-        self.IdCombate = IdCombate
-        self.__Clave = Clave
+    def __init__(self, id_combate: str, clave: int):
+        self.id_combate = id_combate
+        self.__clave = clave
 
 class Nave(UnidadesCombateEstelares):
 
-    def __init__(self, IdCombate: str, Clave: int, Nombre: str, PiezasRepuesto: list):
-        super().__init__(IdCombate, Clave)
-        self.Nombre = Nombre
-        self.PiezasRepuesto = PiezasRepuesto
+    def __init__(self, id_combate: str, clave: int, nombre: str, piezas_repuesto: list):
+        super().__init__(id_combate, clave)
+        self.nombre = nombre
+        self.piezas_repuesto = piezas_repuesto
 
 class EstacionEstelar(Nave):
     
-    def __init__(self, IdCombate: str, Clave: int, Nombre: str, PiezasRepuesto: list,  Tripulacion: int, Pasaje: int, Ubicacion: EUbicacion): 
-        super().__init__(IdCombate, Clave, Nombre, PiezasRepuesto)
-        self.Tripulacion = Tripulacion
-        self.Pasaje = Pasaje
-        self.Ubicacion = Ubicacion
+    def __init__(self, id_combate: str, clave: int, nombre: str, piezas_repuesto: list, tripulacion: int, pasaje: int, ubicacion: EUbicacion): 
+        super().__init__(id_combate, clave, nombre, piezas_repuesto)
+        self.tripulacion = tripulacion
+        self.pasaje = pasaje
+        self.ubicacion = ubicacion
 
 class NaveEstelar(Nave):
 
-    def __init__(self, IdCombate: str, Clave: int, Nombre: str, PiezasRepuesto: list, Tripulacion: int, Pasaje: int, Clase: EClase):
-        super().__init__(IdCombate, Clave, Nombre, PiezasRepuesto)
-        self.Tripulacion = Tripulacion
-        self.Pasaje = Pasaje
-        self.clase = Clase
+    def __init__(self, id_combate: str, clave: int, nombre: str, piezas_repuesto: list, tripulacion: int, pasaje: int, clase: EClase):
+        super().__init__(id_combate, clave, nombre, piezas_repuesto)
+        self.tripulacion = tripulacion
+        self.pasaje = pasaje
+        self.clase = clase
 
 class CazaEstelar(Nave):
 
-    def __init__(self, IdCombate: str, Clave: int, Nombre: str, PiezasRepuesto: list, Dotacion: int):
-        super().__init__(IdCombate, Clave, Nombre, PiezasRepuesto)
-        self.Dotacion = Dotacion
+    def __init__(self, id_combate: str, clave: int, nombre: str, piezas_repuesto: list, dotacion: int):
+        super().__init__(id_combate, clave, nombre, piezas_repuesto)
+        self.dotacion = dotacion
+
+class Repuesto:
+    def __init__(self, nombre_repuesto : str, provedor : str,  cantidad_disponible : int, precio : float):
+        self.nombre_repuesto = nombre_repuesto
+        self.provedor = provedor
+        self.__cantidad_disponible = cantidad_disponible
+        self.precio = precio
+
+class Almacen:
+    def __init__(self, nombre : str, localizacion: str):
+        self.nombre = nombre
+        self.localizacion = localizacion
+        self.catalogo_repuesto = []
+        
+class UsuarioSistema:
+    def __init__(self, id_usuario : str, clave_usuario : int):
+        self.id_usuario = id_usuario
+        self.__clave_usuario = clave_usuario
