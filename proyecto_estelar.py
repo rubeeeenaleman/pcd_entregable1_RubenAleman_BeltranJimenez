@@ -92,23 +92,23 @@ class Comandante(UsuarioSistema):
         ''' Buscamos la pieza entre los distintos catálogos de cada uno de los almacenes del Imperio Galáctico y devolvemos si la pieza se encuentra disponible.'''
         for almacen in almacenes_imperio:
             for repuesto in almacen.catalogo_repuesto:
-                if repuesto == nombre_pieza and repuesto.get_canitdad() > 0:
+                if repuesto == nombre_pieza and repuesto.get_cantidad_disponible() > 0:
                     return True
     
     def consultrar_precio(self, nombre_pieza : str, almacenes_imperio : list , precio : float):
         ''' Para una pieza concreta, buscamos el precio que tiene'''  
         for almacen in almacenes_imperio:
             for repuesto in almacen.catalogo_repuesto:
-                if repuesto == nombre_pieza and repuesto.get_canitdad() > 0:
+                if repuesto == nombre_pieza and repuesto.get_cantidad_disponible() > 0:
                     return repuesto.get_precio() # definir método get
                 
     def adquirir_repuesto(self, nombre_pieza : str, almacenes_imperio : list , cantidad : int ):
         '''Buscamos la pieza y la cantidad desdeada'''
         for almacen in almacenes_imperio:
             for repuesto in almacen.catalogo_repuesto:
-                if repuesto == nombre_pieza and (repuesto.get_canitdad() - cantidad) > 0:
+                if repuesto == nombre_pieza and (repuesto.get_cantidad_disponible() - cantidad) > 0:
                     
-                    nuevo_stock = repuesto.get_cantidad() - cantidad
+                    nuevo_stock = repuesto.get_cantidad_disponible() - cantidad
                     repuesto.set_cantidad(nuevo_stock) # definir método set
                     self.nave_asignada.piezas_repuesto.append(nombre_pieza) # añadimos el repuesto a la nave del comandante.
                     return True
@@ -139,6 +139,6 @@ class Operario(UsuarioSistema):
         '''Dado un repuesto modificamos el stock'''
         for repuesto in self.almacen_asignado.catalogo_repuestos:
             if repuesto == nombre_repuesto:
-                repuesto.set_cantidad(nueva_cantidad) # definir metodo set
+                repuesto.set_cantidad_disponible(nueva_cantidad) # definir metodo set
         
     
