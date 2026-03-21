@@ -17,6 +17,9 @@ class UnidadesCombateEstelares:
         self.id_combate = id_combate
         self.__clave = clave
 
+    def get_clave(self):
+        return self.__clave
+
 class Nave(UnidadesCombateEstelares):
 
     def __init__(self, id_combate: str, clave: int, nombre: str, piezas_repuesto: list):
@@ -24,7 +27,7 @@ class Nave(UnidadesCombateEstelares):
         self.nombre = nombre
         self.piezas_repuesto = []
 
-class EstacionEstelar(Nave):
+class EstacionEspacial(Nave):
     
     def __init__(self, id_combate: str, clave: int, nombre: str, piezas_repuesto: list, tripulacion: int, pasaje: int, ubicacion: EUbicacion): 
         super().__init__(id_combate, clave, nombre, piezas_repuesto)
@@ -141,4 +144,10 @@ class Operario(UsuarioSistema):
             if repuesto == nombre_repuesto:
                 repuesto.set_cantidad_disponible(nueva_cantidad) # definir metodo set
         
+
+
+if __name__ == '__main__':
+# definimos clases
+    unidad_aerea = UnidadesCombateEstelares(id_combate=1, clave=0)
+    caza = Nave(nombre='Caza Moderno', piezas_repuesto=['piston', 'bomba de combustible', 'faros estelares'])
     
