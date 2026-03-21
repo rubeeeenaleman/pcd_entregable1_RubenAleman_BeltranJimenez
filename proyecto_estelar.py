@@ -144,10 +144,9 @@ class Operario(UsuarioSistema):
             if repuesto == nombre_repuesto:
                 repuesto.set_cantidad_disponible(nueva_cantidad) # definir metodo set
         
-
-
 if __name__ == '__main__':
-# definimos clases
-    unidad_aerea = UnidadesCombateEstelares(id_combate=1, clave=0)
-    caza = Nave(nombre='Caza Moderno', piezas_repuesto=['piston', 'bomba de combustible', 'faros estelares'])
-    
+    unidad_aerea = UnidadesCombateEstelares(id_combate="U-001", clave=1234)
+    nave = Nave(id_combate="N-002", clave=5555, nombre='Caza Moderno',piezas_repuesto=['piston', 'bomba'])
+    estacion = EstacionEspacial(id_combate="E-003", clave=9999, nombre="Estrella de la Muerte", piezas_repuesto=["Láser"], tripulacion=50, pasaje=4, ubicacion=EUbicacion.ENDOR)
+
+    print(f'Prueba unidad aerea: \n id de combate: {unidad_aerea.id_combate}, clave: {unidad_aerea.get_clave()}') # hay que recordar que clave es un atributo privado, sin ayuda del metodo get, nos da ERROR.
