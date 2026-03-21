@@ -53,6 +53,15 @@ class Repuesto:
         self.__cantidad_disponible = cantidad_disponible
         self.precio = precio
 
+    def get_precio(self): # método get para precio definido
+        return self.precio
+    
+    def get_cantidad_disponible(self): # método get para cantidad definido
+        return self.__cantidad_disponible
+
+    def set_cantidad_disponible(self, cantidad_disponible): # metodo set para cantidad definido
+        self.__cantidad_disponible = cantidad_disponible
+
 class Almacen:
     def __init__(self, nombre : str, localizacion: str):
         self.nombre = nombre
