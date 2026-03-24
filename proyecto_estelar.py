@@ -1,4 +1,5 @@
 from enum import Enum
+from abc import ABC, abstractmethod
 
 class EUbicacion(Enum):
     ENDOR = 1
@@ -11,17 +12,34 @@ class EClase(Enum):
     SOBERANO = 3
 
 
-class UnidadesCombateEstelares:
-
+class UnidadesCombateEstelares(ABC):
+    '''    
+    Implementamos como clase abstracta, pues la unidad de 
+    combate no es una 
+    nave o vehículo concreto, sino un concepto general que 
+    representa un elemento de la flota.
+    '''
+    
     def __init__(self, id_combate: str, clave: int):
         self.id_combate = id_combate
         self.__clave = clave
 
     def get_clave(self):
         return self.__clave
+    
+    @abstractmethod 
+    def mostrar_especificaciones(self):
+        pass # no devuelve nada, simplemente obliga a que las clases nietos tengan esta función.
 
 class Nave(UnidadesCombateEstelares):
-
+    '''
+    Decidimos no ponerme el método asbtracto, pues relamente
+    este objeto Nave, no represetna una nave concreta, sino un 
+    concepto de las características básicas que debe de tener 
+    una nave.
+    Así pues, debido a la herencia, está tambíen será una clase asbtracta
+    '''
+    
     def __init__(self, id_combate: str, clave: int, nombre: str, piezas_repuesto: list):
         super().__init__(id_combate, clave)
         self.nombre = nombre
@@ -35,6 +53,10 @@ class EstacionEspacial(Nave):
         self.pasaje = pasaje
         self.ubicacion = ubicacion
 
+    def mostrar_especificaciones(self):
+        return f"Estación {self.nombre}, operando en {self.ubicacion.name}.A bordo {self.tripulacion} tripulantes y con capacidad para {self.pasaje} pasajeros."
+
+
 class NaveEstelar(Nave):
 
     def __init__(self, id_combate: str, clave: int, nombre: str, piezas_repuesto: list, tripulacion: int, pasaje: int, clase: EClase):
@@ -42,13 +64,21 @@ class NaveEstelar(Nave):
         self.tripulacion = tripulacion
         self.pasaje = pasaje
         self.clase = clase
-
+        
+    def mostrar_especificaciones(self):
+        return f"Nave estelar {self.nombre}, clase {self.clase.name}.A bordo {self.tripulacion} tripulantes y con capacidad para {self.pasaje} pasajeros."
+    
 class CazaEstelar(Nave):
 
     def __init__(self, id_combate: str, clave: int, nombre: str, piezas_repuesto: list, dotacion: int):
         super().__init__(id_combate, clave, nombre, piezas_repuesto)
         self.dotacion = dotacion
 
+    
+    def mostrar_especificaciones(self):
+        return f"Caza {self.nombre}, con ID de comabte: {self.id_combate} . "
+    
+    
 class Repuesto:
     def __init__(self, nombre_repuesto : str, provedor : str,  cantidad_disponible : int, precio : float):
         self.nombre_repuesto = nombre_repuesto
@@ -69,18 +99,25 @@ class Repuesto:
         self.__cantidad_disponible = nueva_cantidad
         
         
-
 class Almacen:
     def __init__(self, nombre : str, localizacion: str):
         self.nombre = nombre
         self.localizacion = localizacion
         self.catalogo_repuestos = []
         
-class UsuarioSistema:
+class UsuarioSistema(ABC):
+    '''
+    UsuariosSistema será una clase abstracta, porque no representa un entre concreto.
+    Su funcionalidad es de clase base para determinar los atributos mínimos necesarios para poder estar en el sistema.
+    '''
+    
     def __init__(self, id_usuario : str, clave_usuario : int):
         self.id_usuario = id_usuario
         self.__clave_usuario = clave_usuario
-        
+    
+    @abstractmethod 
+    def mostrar_informacion(self):
+        pass # no devuelve nada, simplemente obliga a que las clases hijas tengan esta función.
 class Comandante(UsuarioSistema):
     ''' 
     En nuestro gestor de mantenimiento de la flota, el Comandante será el encargado de gestionar su nave, por tanto él será el único 
@@ -96,6 +133,11 @@ class Comandante(UsuarioSistema):
         
         self.nave_asignada = nave_asignada
     
+    
+    def mostrar_informacion(self):
+        return f"Comandante {self.id_usuario} encargado de {self.nave_asignada.nombre}"
+
+    
     def consultar_disponibilidad(self, nombre_pieza : str, almacenes_imperio : list): 
         ''' Buscamos la pieza entre los distintos catálogos de cada uno de los almacenes del Imperio Galáctico y devolvemos si la pieza se encuentra disponible.'''
         for almacen in almacenes_imperio:
@@ -103,7 +145,7 @@ class Comandante(UsuarioSistema):
                 if repuesto.get_nombre() == nombre_pieza and repuesto.get_cantidad_disponible() > 0:
                     return True
     
-    def consultrar_precio(self, nombre_pieza : str, almacenes_imperio : list ):
+    def consultar_precio(self, nombre_pieza : str, almacenes_imperio : list ):
         ''' Para una pieza concreta, buscamos el precio que tiene'''  
         for almacen in almacenes_imperio:
             for repuesto in almacen.catalogo_repuestos:
@@ -134,7 +176,10 @@ class Operario(UsuarioSistema):
         super().__init__(id_usuario, clave_usuario)
         
         self.almacen_asignado = almacen_asignado
-        
+    
+    def mostrar_informacion(self):
+        return f"Operario {self.id_usuario}, trabajdor del almacen: {self.almacen_asignado.nombre}"
+    
     def añadir_repuesto(self, nuevo_repuesto : Repuesto) :
         ''' Añadimos un nuevo repuesto'''
         self.almacen_asignado.catalogo_repuestos.append(nuevo_repuesto)
