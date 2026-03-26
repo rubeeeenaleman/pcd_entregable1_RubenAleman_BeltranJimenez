@@ -80,9 +80,9 @@ class CazaEstelar(Nave):
     
     
 class Repuesto:
-    def __init__(self, nombre_repuesto : str, provedor : str,  cantidad_disponible : int, precio : float):
+    def __init__(self, nombre_repuesto : str, proveedor : str,  cantidad_disponible : int, precio : float):
         self.nombre_repuesto = nombre_repuesto
-        self.provedor = provedor
+        self.proveedor = proveedor
         self.__cantidad_disponible = cantidad_disponible
         self.precio = precio
 
@@ -94,6 +94,9 @@ class Repuesto:
     
     def get_cantidad_disponible(self): 
         return self.__cantidad_disponible
+    
+    def get_proveedor(self):
+        return self.proveedor
 
     def set_cantidad_disponible(self, nueva_cantidad): 
         self.__cantidad_disponible = nueva_cantidad
@@ -160,12 +163,12 @@ class Comandante(UsuarioSistema):
                     pieza_encontrada = True
                     if repuesto.get_precio() < precio_mas_bajo:
                         precio_mas_bajo = repuesto.get_precio()
-                        repuesto_mas_barato = repuesto
+                        repuesto_mas_barato = repuesto.get_nombre()
         
         if pieza_encontrada:
-            return precio_mas_bajo, repuesto_mas_barato
+            return f"Mejor precio {precio_mas_bajo}, para el repuesto {repuesto_mas_barato}"
         else:
-            None
+            return None
                 
     def adquirir_repuesto(self, nombre_pieza : str, almacenes_imperio : list , cantidad : int ):
         '''Adquiere el número de repuestos necesarios en ese momento para una nave, actualiza el stock y además hace una consulta eficiente, quedándose con los repuestos más baratos.'''
@@ -183,7 +186,7 @@ class Comandante(UsuarioSistema):
             print('Error: No hay suficiente stock en la galaxia.')
             return False
         
-        repuestos_mas_baratos.sort() # ordenamos los repuestos que hemos insertado en la lista por precio de menor a mayor
+        repuestos_mas_baratos.sort() # ordenamos los repuestos que hemos insertado en la lista por precio de menor a mayor (funciona gracias al método lt)
         # recorremos la lista ordenada por precio en orden ascendente
         for repuesto in repuestos_mas_baratos: 
             while cantidad > 0 and repuesto.get_cantidad_disponible() > 0:
@@ -197,9 +200,17 @@ class Comandante(UsuarioSistema):
 class Operario(UsuarioSistema):
     '''
     En nuestro software gestor contratado por el Imperio Galáctico, la función de los operarios será el mantenimiento de los 
-    almacenes que se encuentran por la galaxia. Un operario esta ligado a un almacen, su objetivo será dada una entrada de repuestos
-    que le lleguen 'ordenarlos' en el catálogo del almacen. No obstate, también se pueden dar otras situaciones como que llegue un 
-    nuevo modelo de un repuesto y el operario decida descatalogar el modelo antiguo. 
+    almacenes que se encuentran por la galaxia. Un operario esta ligado a un almacen y su objetivo será dada una entrada de repuestos 
+    que le lleguen 'ordenarlos' en el catálogo del almacen. No obstante, también se pueden dar otras situaciones como que llegue un 
+    nuevo modelo de un repuesto y el operario decida descatalogar el modelo antiguo. O una entrada masiva de un repuesto muy popular y tener que hacer 
+    una modificación grande del stock.
+    
+    Tambíen, los operarios están muy concienciados con los tiempos de espera (que en el sistema gestor no se aprecian), así por tanto, si un repuesto es muy popular en las cercanias de un almacén concreto, los operadores que trabajan allík, querrán tener el máximo stock posible del repuesto, para poder entregarlos de manera dinámica. Cuando el proveedor no puede absatecer dicha demanda y en almacenes lejanos el porducto no es tan popular, lo mejor para la correcta gestión del Imperio Galácitco, sera poder abastecer el almacén popular.
+    Por tanto surge la encesidad, de poder transferir repuestos entre almacenes.
+    
+    El operario a la hora de identificar un Repuesto, no puede hacerlo unícamente por el nombre, pues el mismo repuesto puede venir de diferentes proveedores y con distitno precio.
+    Por tanto, hemos decidido que lo mejor sera identificar un repuesto concreto por la tupla: nombre, proveedor. Esta consideración, no es tomada para comandnate, ya que ellos
+    no están tan relacionados con lso técnicimos que puede dar un repuesto según el proveedor.
     '''
     
     def __init__(self, id_usuario : str, clave_usuario : int, almacen_asignado : str):
@@ -209,21 +220,46 @@ class Operario(UsuarioSistema):
     
     def mostrar_informacion(self):
         return f"Operario {self.id_usuario}, trabajdor del almacen: {self.almacen_asignado.nombre}"
-    
+
+            
     def añadir_repuesto(self, nuevo_repuesto : Repuesto) :
-        ''' Añadimos un nuevo repuesto'''
+        ''' Se trata de añadir un neuvo repuesto, en el caso de que exista, se incremetna su stock.'''
+        nombre_repuesto= nuevo_repuesto.get_nombre()
+        proveedor= nuevo_repuesto.get_proveedor()
+        
+        for pieza in self.almacen_asignado.catalogo_repuestos:
+            if nombre_repuesto == pieza.get_nombre() and proveedor == pieza.get_proveedor():
+                nuevo_stock = pieza.get_cantidad_disponible() + 1 
+                pieza.set_cantidad_disponible(nuevo_stock)
+                return True
         self.almacen_asignado.catalogo_repuestos.append(nuevo_repuesto)
         
-    def eliminar_repuesto(self, nombre_repuesto : str):
+    def eliminar_repuesto(self, nombre_repuesto : str, proveedor  : str):
         '''Eliminamos repuesto'''
-        self.almacen_asignado.catalogo_repuestos.remove(nombre_repuesto)
-        
-    def modificar_stock(self, nombre_repuesto : str, nueva_cantidad : int):
-        '''Dado un repuesto modificamos el stock'''
         for repuesto in self.almacen_asignado.catalogo_repuestos:
-            if repuesto.get_nombre() == nombre_repuesto:
-                repuesto.set_cantidad_disponible(nueva_cantidad) 
+            if nombre_repuesto == repuesto.get_nombre() and proveedor == repuesto.get_proveedor():
+                self.almacen_asignado.catalogo_repuestos.remove(repuesto)
+                return True # la operación ha sido realizada con éxito
+        return "ERROR" # añadimos excepción
+
         
+    def modificar_stock(self, nombre_repuesto : str, proveedor  : str, nueva_cantidad : int):
+        '''Dado un repuesto modificamos el stock, para no tener que ir incremetnado o decrementando de 1 en 1.'''
+        for repuesto in self.almacen_asignado.catalogo_repuestos:
+            if nombre_repuesto == repuesto.get_nombre() and proveedor == repuesto.get_proveedor():
+                repuesto.set_cantidad_disponible(nueva_cantidad) 
+        return 'ERROR'
+    
+    
+    def transferir_repuesto(self, almacen_destino, nombre_repuesto: str, proveedor  : str) :
+        """Mueve un repuesto entero desde el almacén actual a otro almacén del Imperio."""
+        for repuesto in self.almacen_asignado.catalogo_repuestos:
+            if nombre_repuesto == repuesto.get_nombre() and proveedor == repuesto.get_proveedor():
+                # Añadimos al almacén destino y eliminamos del actual
+                almacen_destino.catalogo_repuestos.append(repuesto)
+                self.almacen_asignado.catalogo_repuestos.remove(repuesto)
+                return True
+        return 'ERROR'
 if __name__ == '__main__':
     # EJEMPLO DE PRUEBA PARA EL FUNCIONAMIENTO DE LA MAYORÍA DE FUNCIONES DEFINIDAS
     
@@ -239,7 +275,7 @@ if __name__ == '__main__':
     operario = Operario(id_usuario="OP-421", clave_usuario=3333, almacen_asignado=almacen_tatooine)
     
     # REPUESTO
-    motor = Repuesto(nombre_repuesto="Motor Iónico", provedor="Sienar", cantidad_disponible=5, precio=2500.0)
+    motor = Repuesto(nombre_repuesto="Motor Iónico", proveedor="Sienar", cantidad_disponible=5, precio=2500.0)
     
     print(f"\nOperario {operario.id_usuario} trabajando en el alamcen :  {almacen_tatooine.nombre}")
     
