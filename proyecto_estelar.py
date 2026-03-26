@@ -97,6 +97,9 @@ class Repuesto:
 
     def set_cantidad_disponible(self, nueva_cantidad): 
         self.__cantidad_disponible = nueva_cantidad
+    
+    def __lt__(self, otro_repuesto): # método less than para poder comparar repuestos por precio
+        return self.get_precio() < otro_repuesto.get_precio()
         
         
 class Almacen:
@@ -165,16 +168,31 @@ class Comandante(UsuarioSistema):
             None
                 
     def adquirir_repuesto(self, nombre_pieza : str, almacenes_imperio : list , cantidad : int ):
-        '''Buscamos la pieza y la cantidad desdeada'''
+        '''Adquiere el número de repuestos necesarios en ese momento para una nave, actualiza el stock y además hace una consulta eficiente, quedándose con los repuestos más baratos.'''
+        repuestos_mas_baratos = []
+        stock_total = 0
+
         for almacen in almacenes_imperio:
             for repuesto in almacen.catalogo_repuestos:
-                if repuesto.get_nombre() == nombre_pieza and (repuesto.get_cantidad_disponible() - cantidad) >= 0:
-                    
-                    nuevo_stock = repuesto.get_cantidad_disponible() - cantidad
-                    repuesto.set_cantidad_disponible(nuevo_stock) 
-                    self.nave_asignada.piezas_repuesto.append(nombre_pieza) # añadimos el repuesto a la nave del comandante.
-                    return True
-        return False
+                if repuesto.get_nombre() == nombre_pieza and (repuesto.get_cantidad_disponible()) > 0:
+                    repuestos_mas_baratos.append(repuesto)
+                    stock_total += repuesto.get_cantidad_disponible()
+        
+        # esta parte podría ser tratada como una excepción más adelante
+        if stock_total < cantidad:
+            print('Error: No hay suficiente stock en la galaxia.')
+            return False
+        
+        repuestos_mas_baratos.sort() # ordenamos los repuestos que hemos insertado en la lista por precio de menor a mayor
+        # recorremos la lista ordenada por precio en orden ascendente
+        for repuesto in repuestos_mas_baratos: 
+            while cantidad > 0 and repuesto.get_cantidad_disponible() > 0:
+                nuevo_stock = repuesto.get_cantidad_disponible() - 1 #  recordamos que ahora la selección se hace de uno en uno
+                repuesto.set_cantidad_disponible(nuevo_stock)
+
+                self.nave_asignada.piezas_repuesto.append(nombre_pieza)
+                cantidad = cantidad - 1
+        return True
                     
 class Operario(UsuarioSistema):
     '''
