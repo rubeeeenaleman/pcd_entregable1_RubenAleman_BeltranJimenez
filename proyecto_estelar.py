@@ -146,11 +146,23 @@ class Comandante(UsuarioSistema):
                     return True
     
     def consultar_precio(self, nombre_pieza : str, almacenes_imperio : list ):
-        ''' Para una pieza concreta, buscamos el precio que tiene'''  
+        ''' Para una pieza concreta, buscamos el precio que tiene y además, se devuelve la pieza con menor precio entre todas ellas.'''  
+        precio_mas_bajo = float('inf')
+        pieza_encontrada = False
+        repuesto_mas_barato = None
+
         for almacen in almacenes_imperio:
             for repuesto in almacen.catalogo_repuestos:
                 if repuesto.get_nombre() == nombre_pieza and repuesto.get_cantidad_disponible() > 0:
-                    return repuesto.get_precio() 
+                    pieza_encontrada = True
+                    if repuesto.get_precio() < precio_mas_bajo:
+                        precio_mas_bajo = repuesto.get_precio()
+                        repuesto_mas_barato = repuesto
+        
+        if pieza_encontrada:
+            return precio_mas_bajo, repuesto_mas_barato
+        else:
+            None
                 
     def adquirir_repuesto(self, nombre_pieza : str, almacenes_imperio : list , cantidad : int ):
         '''Buscamos la pieza y la cantidad desdeada'''
