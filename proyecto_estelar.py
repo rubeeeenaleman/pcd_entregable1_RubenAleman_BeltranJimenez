@@ -1,6 +1,16 @@
 from enum import Enum
 from abc import ABC, abstractmethod
 
+# COMENZAMOS DEFINIENDO LAS EXPCECPIONES:
+class ErrorRepuestoNoEncontrado(Exception):
+    '''A la hora de realizar compras, modificaciones o cualquier acción que trate con una pieza, esta debe de existir'''
+    pass
+
+class ErrorStockInsuficiente(Exception):
+    '''En el momento de realizar acciones como comprar o consultar una pieza, esta debe de tener el stock necesario para dicha acción. '''
+    pass
+
+
 class EUbicacion(Enum):
     ENDOR = 1
     CUMULO_RAIMOS = 2
@@ -146,29 +156,50 @@ class Comandante(UsuarioSistema):
     
     def consultar_disponibilidad(self, nombre_pieza : str, almacenes_imperio : list): 
         ''' Buscamos la pieza entre los distintos catálogos de cada uno de los almacenes del Imperio Galáctico y devolvemos si la pieza se encuentra disponible.'''
+        pieza_existe = False
+        pieza_con_stock = False
+        
         for almacen in almacenes_imperio:
             for repuesto in almacen.catalogo_repuestos:
-                if repuesto.get_nombre() == nombre_pieza and repuesto.get_cantidad_disponible() > 0:
-                    return True
+                if repuesto.get_nombre() == nombre_pieza :
+                    pieza_existe = True 
+                    
+                    if repuesto.get_cantidad_disponible() > 0:
+                        pieza_con_stock = True
+                        return True 
+        
+        if not pieza_existe:
+            raise ErrorRepuestoNoEncontrado(f"Fallo en la consulta: El repuesto '{nombre_pieza}' no existe en la base de datos del Imperio.")
+            
+        else :
+             raise ErrorStockInsuficiente(f"Fallo en la consulta: No hay stock disponible del repuesto '{nombre_pieza}'.")
+   
     
     def consultar_precio(self, nombre_pieza : str, almacenes_imperio : list ):
         ''' Para una pieza concreta, buscamos el precio que tiene y además, se devuelve la pieza con menor precio entre todas ellas.'''  
         precio_mas_bajo = float('inf')
-        pieza_encontrada = False
+        pieza_existe = False
+        pieza_con_stock = False
         repuesto_mas_barato = None
 
         for almacen in almacenes_imperio:
             for repuesto in almacen.catalogo_repuestos:
-                if repuesto.get_nombre() == nombre_pieza and repuesto.get_cantidad_disponible() > 0:
-                    pieza_encontrada = True
-                    if repuesto.get_precio() < precio_mas_bajo:
-                        precio_mas_bajo = repuesto.get_precio()
-                        repuesto_mas_barato = repuesto.get_nombre()
+                if repuesto.get_nombre() == nombre_pieza :
+                    pieza_existe = True # para las excpeciones usamos dos if, así detecatamos mejor donde se encuentra el error, si por stock o por inexistencia de pieza
+                    
+                    if repuesto.get_cantidad_disponible() > 0:
+                        pieza_con_stock = True
+                        if repuesto.get_precio() < precio_mas_bajo:
+                            precio_mas_bajo = repuesto.get_precio()
+                            repuesto_mas_barato = repuesto.get_nombre()
         
-        if pieza_encontrada:
-            return f"Mejor precio {precio_mas_bajo}, para el repuesto {repuesto_mas_barato}"
-        else:
-            return None
+        if not pieza_existe:
+            raise ErrorRepuestoNoEncontrado(f"Fallo en la consulta: El repuesto '{nombre_pieza}' no existe en la base de datos del Imperio.")
+            
+        if not pieza_con_stock:
+             raise ErrorStockInsuficiente(f"Fallo en la consulta: No hay stock disponible del repuesto '{nombre_pieza}'.")
+
+        return f"Mejor precio {precio_mas_bajo}, para el repuesto {repuesto_mas_barato}"
                 
     def adquirir_repuesto(self, nombre_pieza : str, almacenes_imperio : list , cantidad : int ):
         '''Adquiere el número de repuestos necesarios en ese momento para una nave, actualiza el stock y además hace una consulta eficiente, quedándose con los repuestos más baratos.'''
@@ -181,10 +212,11 @@ class Comandante(UsuarioSistema):
                     repuestos_mas_baratos.append(repuesto)
                     stock_total += repuesto.get_cantidad_disponible()
         
-        # esta parte podría ser tratada como una excepción más adelante
+        if len(repuestos_mas_baratos) == 0:
+            raise ErrorRepuestoNoEncontrado(f"Fallo en la compra: El repuesto '{nombre_pieza}' no existe en la base de datos del Imperio.")
+        
         if stock_total < cantidad:
-            print('Error: No hay suficiente stock en la galaxia.')
-            return False
+            raise ErrorStockInsuficiente(f"Fallo en la compra: No hay stock disponible del repuesto '{nombre_pieza}'.")
         
         repuestos_mas_baratos.sort() # ordenamos los repuestos que hemos insertado en la lista por precio de menor a mayor (funciona gracias al método lt)
         # recorremos la lista ordenada por precio en orden ascendente
@@ -229,10 +261,11 @@ class Operario(UsuarioSistema):
         
         for pieza in self.almacen_asignado.catalogo_repuestos:
             if nombre_repuesto == pieza.get_nombre() and proveedor == pieza.get_proveedor():
-                nuevo_stock = pieza.get_cantidad_disponible() + 1 
+                nuevo_stock = pieza.get_cantidad_disponible() + + nuevo_repuesto.get_cantidad_disponible()
                 pieza.set_cantidad_disponible(nuevo_stock)
                 return True
         self.almacen_asignado.catalogo_repuestos.append(nuevo_repuesto)
+        return True
         
     def eliminar_repuesto(self, nombre_repuesto : str, proveedor  : str):
         '''Eliminamos repuesto'''
@@ -240,7 +273,7 @@ class Operario(UsuarioSistema):
             if nombre_repuesto == repuesto.get_nombre() and proveedor == repuesto.get_proveedor():
                 self.almacen_asignado.catalogo_repuestos.remove(repuesto)
                 return True # la operación ha sido realizada con éxito
-        return "ERROR" # añadimos excepción
+        raise ErrorRepuestoNoEncontrado(f"Fallo en la operación de eliminar: El repuesto '{nombre_repuesto}' no existe en la base de datos del Imperio.")
 
         
     def modificar_stock(self, nombre_repuesto : str, proveedor  : str, nueva_cantidad : int):
@@ -248,7 +281,7 @@ class Operario(UsuarioSistema):
         for repuesto in self.almacen_asignado.catalogo_repuestos:
             if nombre_repuesto == repuesto.get_nombre() and proveedor == repuesto.get_proveedor():
                 repuesto.set_cantidad_disponible(nueva_cantidad) 
-        return 'ERROR'
+        raise ErrorRepuestoNoEncontrado(f"Fallo en la operación de eliminar: El repuesto '{nombre_repuesto}' no existe en la base de datos del Imperio.")
     
     
     def transferir_repuesto(self, almacen_destino, nombre_repuesto: str, proveedor  : str) :
@@ -259,7 +292,7 @@ class Operario(UsuarioSistema):
                 almacen_destino.catalogo_repuestos.append(repuesto)
                 self.almacen_asignado.catalogo_repuestos.remove(repuesto)
                 return True
-        return 'ERROR'
+        raise ErrorRepuestoNoEncontrado(f"Fallo en la operación de eliminar: El repuesto '{nombre_repuesto}' no existe en la base de datos del Imperio.")
 if __name__ == '__main__':
     # EJEMPLO DE PRUEBA PARA EL FUNCIONAMIENTO DE LA MAYORÍA DE FUNCIONES DEFINIDAS
     
