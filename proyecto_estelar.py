@@ -245,7 +245,7 @@ class Operario(UsuarioSistema):
     
     El operario a la hora de identificar un Repuesto, no puede hacerlo unícamente por el nombre, pues el mismo repuesto puede venir de diferentes proveedores y con distinto precio.
     Por tanto, hemos decidido que lo mejor será identificar un repuesto concreto por la tupla: nombre, proveedor. Esta consideración, no es tomada para comandnate, ya que ellos
-    no están tan relacionados con los técnicismos que puede dar un repuesto según el proveedor.
+    no están relacionados con los técnicismos que puede dar un repuesto según el proveedor.
     '''
     
     def __init__(self, id_usuario : str, clave_usuario : int, almacen_asignado : str):
@@ -264,14 +264,14 @@ class Operario(UsuarioSistema):
         
         for pieza in self.almacen_asignado.catalogo_repuestos:
             if nombre_repuesto == pieza.get_nombre() and proveedor == pieza.get_proveedor():
-                nuevo_stock = pieza.get_cantidad_disponible() + + nuevo_repuesto.get_cantidad_disponible()
+                nuevo_stock = pieza.get_cantidad_disponible() + nuevo_repuesto.get_cantidad_disponible()
                 pieza.set_cantidad_disponible(nuevo_stock)
                 return True
         self.almacen_asignado.catalogo_repuestos.append(nuevo_repuesto)
         return True
         
     def eliminar_repuesto(self, nombre_repuesto : str, proveedor  : str):
-        '''Eliminamos repuesto'''
+        '''Eliminamos repuesto, dado su identificador'''
         for repuesto in self.almacen_asignado.catalogo_repuestos:
             if nombre_repuesto == repuesto.get_nombre() and proveedor == repuesto.get_proveedor():
                 self.almacen_asignado.catalogo_repuestos.remove(repuesto)
@@ -298,9 +298,10 @@ class Operario(UsuarioSistema):
                 return True
         raise ErrorRepuestoNoEncontrado(f"Fallo en la operación de eliminar: El repuesto '{nombre_repuesto}' no existe en la base de datos del Imperio.")
     
-# hemos decidido crear un código de prueba con un pelín de ambientración, así se hace más entretenido.
 
 if __name__ == '__main__':
+    # Como el poryecto nos ha parecido muy entrentenido y ambos somos grandes fan de la saga Star Wars, hemos decidio 'dar algo de ambientación' a nuestro 
+    # código de prueba
     import time 
 
     print("\n" + "-"*80)
@@ -318,7 +319,7 @@ if __name__ == '__main__':
     print(f" -> {destructor.mostrar_especificaciones()}")
     print(f" -> {estacion.mostrar_especificaciones()}")
 
-    vader = Comandante(id_usuario="Lord Vader", clave_usuario=0000, nave_asignada=caza_vader)
+    vader = Comandante(id_usuario="Lord Vader", clave_usuario=1234, nave_asignada=caza_vader)
     tarkin = Comandante(id_usuario="Grand Moff Tarkin", clave_usuario=1111, nave_asignada=estacion)
 
     # --- ACTO 2: INFRAESTRUCTURA DE ALMACENES Y OPERARIOS ---
