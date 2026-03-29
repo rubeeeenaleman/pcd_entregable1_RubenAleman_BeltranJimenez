@@ -43,11 +43,11 @@ class UnidadesCombateEstelares(ABC):
 
 class Nave(UnidadesCombateEstelares):
     '''
-    Decidimos no ponerme el método asbtracto, pues relamente
-    este objeto Nave, no represetna una nave concreta, sino un 
+    Decidimos no ponerle el método asbtracto, pues realmente
+    este objeto Nave, no representa una nave concreta, sino un 
     concepto de las características básicas que debe de tener 
     una nave.
-    Así pues, debido a la herencia, está tambíen será una clase asbtracta
+    Así pues, debido a la herencia, esta tambíen será una clase asbtracta
     '''
     
     def __init__(self, id_combate: str, clave: int, nombre: str, piezas_repuesto: list):
@@ -123,7 +123,7 @@ class Almacen:
         
 class UsuarioSistema(ABC):
     '''
-    UsuariosSistema será una clase abstracta, porque no representa un entre concreto.
+    UsuariosSistema será una clase abstracta, porque no representa un ente concreto.
     Su funcionalidad es de clase base para determinar los atributos mínimos necesarios para poder estar en el sistema.
     '''
     
@@ -134,14 +134,15 @@ class UsuarioSistema(ABC):
     @abstractmethod 
     def mostrar_informacion(self):
         pass # no devuelve nada, simplemente obliga a que las clases hijas tengan esta función.
+
 class Comandante(UsuarioSistema):
     ''' 
     En nuestro gestor de mantenimiento de la flota, el Comandante será el encargado de gestionar su nave, por tanto él será el único 
-    que conozca las piezas que necesita así pues, sugre la necesidad de poder conocer el precio, stock disponible de un repuesto 
+    que conozca las piezas que necesita así pues, surge la necesidad de poder conocer el precio, stock disponible de un repuesto 
     concreto, así como la posibilidad de comprar dicho repuesto. El Comandante a la hora de adqurir una pieza, no se preocupa del 
     almacen en el que se encuentra la pieza, simplemente si la pieza está o no, sin importar donde se encuentre.
     
-    Así por tanto, una vez tenga la pieza adquirida esta se adjuntará a su propia nave, puede que se instale o simplemente este a modo de reserva.
+    Así por tanto, una vez tenga la pieza adquirida esta se adjuntará a su propia nave, puede que se instale o simplemente esté a modo de reserva.
     '''
     def __init__(self, id_usuario : str, clave_usuario : int, nave_asignada : str):
 
@@ -232,17 +233,19 @@ class Comandante(UsuarioSistema):
 class Operario(UsuarioSistema):
     '''
     En nuestro software gestor contratado por el Imperio Galáctico, la función de los operarios será el mantenimiento de los 
-    almacenes que se encuentran por la galaxia. Un operario esta ligado a un almacen y su objetivo será dada una entrada de repuestos 
+    almacenes que se encuentran por la galaxia. Un operario está ligado a un almacen y su objetivo será dada una entrada de repuestos 
     que le lleguen 'ordenarlos' en el catálogo del almacen. No obstante, también se pueden dar otras situaciones como que llegue un 
     nuevo modelo de un repuesto y el operario decida descatalogar el modelo antiguo. O una entrada masiva de un repuesto muy popular y tener que hacer 
     una modificación grande del stock.
     
-    Tambíen, los operarios están muy concienciados con los tiempos de espera (que en el sistema gestor no se aprecian), así por tanto, si un repuesto es muy popular en las cercanias de un almacén concreto, los operadores que trabajan allík, querrán tener el máximo stock posible del repuesto, para poder entregarlos de manera dinámica. Cuando el proveedor no puede absatecer dicha demanda y en almacenes lejanos el porducto no es tan popular, lo mejor para la correcta gestión del Imperio Galácitco, sera poder abastecer el almacén popular.
-    Por tanto surge la encesidad, de poder transferir repuestos entre almacenes.
+    Tambíen, los operarios están muy concienciados con los tiempos de espera (que en el sistema gestor no se aprecian), así por tanto, si un repuesto es muy popular en las cercanias de un almacén concreto, 
+    los operadores que trabajan allí, querrán tener el máximo stock posible del repuesto, para poder entregarlos de manera dinámica. 
+    Cuando el proveedor no puede abastecer dicha demanda y en almacenes lejanos el producto no es tan popular, lo mejor para la correcta gestión del Imperio Galáctico, será poder abastecer el almacén popular.
+    Por tanto surge la necesidad, de poder transferir repuestos entre almacenes.
     
-    El operario a la hora de identificar un Repuesto, no puede hacerlo unícamente por el nombre, pues el mismo repuesto puede venir de diferentes proveedores y con distitno precio.
-    Por tanto, hemos decidido que lo mejor sera identificar un repuesto concreto por la tupla: nombre, proveedor. Esta consideración, no es tomada para comandnate, ya que ellos
-    no están tan relacionados con lso técnicimos que puede dar un repuesto según el proveedor.
+    El operario a la hora de identificar un Repuesto, no puede hacerlo unícamente por el nombre, pues el mismo repuesto puede venir de diferentes proveedores y con distinto precio.
+    Por tanto, hemos decidido que lo mejor será identificar un repuesto concreto por la tupla: nombre, proveedor. Esta consideración, no es tomada para comandnate, ya que ellos
+    no están tan relacionados con los técnicismos que puede dar un repuesto según el proveedor.
     '''
     
     def __init__(self, id_usuario : str, clave_usuario : int, almacen_asignado : str):
@@ -251,11 +254,11 @@ class Operario(UsuarioSistema):
         self.almacen_asignado = almacen_asignado
     
     def mostrar_informacion(self):
-        return f"Operario {self.id_usuario}, trabajdor del almacen: {self.almacen_asignado.nombre}"
+        return f"Operario {self.id_usuario}, trabajador del almacen: {self.almacen_asignado.nombre}"
 
             
     def añadir_repuesto(self, nuevo_repuesto : Repuesto) :
-        ''' Se trata de añadir un neuvo repuesto, en el caso de que exista, se incremetna su stock.'''
+        ''' Se trata de añadir un nuevo repuesto, en el caso de que exista, se incrementa su stock.'''
         nombre_repuesto= nuevo_repuesto.get_nombre()
         proveedor= nuevo_repuesto.get_proveedor()
         
@@ -277,7 +280,7 @@ class Operario(UsuarioSistema):
 
         
     def modificar_stock(self, nombre_repuesto : str, proveedor  : str, nueva_cantidad : int):
-        '''Dado un repuesto modificamos el stock, para no tener que ir incremetnado o decrementando de 1 en 1.'''
+        '''Dado un repuesto modificamos el stock, para no tener que ir incrementando o decrementando de 1 en 1.'''
         for repuesto in self.almacen_asignado.catalogo_repuestos:
             if nombre_repuesto == repuesto.get_nombre() and proveedor == repuesto.get_proveedor():
                 repuesto.set_cantidad_disponible(nueva_cantidad) 
@@ -293,6 +296,11 @@ class Operario(UsuarioSistema):
                 self.almacen_asignado.catalogo_repuestos.remove(repuesto)
                 return True
         raise ErrorRepuestoNoEncontrado(f"Fallo en la operación de eliminar: El repuesto '{nombre_repuesto}' no existe en la base de datos del Imperio.")
+    
+
+
+
+    
 if __name__ == '__main__':
     # EJEMPLO DE PRUEBA PARA EL FUNCIONAMIENTO DE LA MAYORÍA DE FUNCIONES DEFINIDAS
     
