@@ -12,7 +12,7 @@ def test_añadir_repuesto():
     operario.añadir_repuesto(motor)
 
     assert len(almacen.catalogo_repuestos) == 1
-    assert almacen.catalogo_repuestos[0].get_nombre() == 'Motor Ionico'
+    assert almacen.catalogo_repuestos[0].get_nombre() == 'Motor Ionico' # accedemos al primer elemento del catálogo de repuesto
 
 
 '''TEST 2. Comprobar que se actualiza el stock si el repuesto existe.'''
@@ -57,7 +57,7 @@ def test_operario_eliminar_repuesto_inexistente():
 '''TEST 5. Comprobación método adquirir repuesto, comprobamos que funcione correctamente el proceso de selección de piezas eligiendo siempre a más barata.'''
 def test_comandante_adquirir_repuesto():
     caza = CazaEstelar(id_combate="TIE-01", clave=123, nombre="TIE Fighter", piezas_repuesto=[], dotacion=1)
-    vader = Comandante("Vader", 0000, caza)
+    vader = Comandante("Vader", 1234, caza)
 
     almacen_barato = Almacen('Almacen Borde Exterior', 'Tatooine')
     almacen_caro = Almacen('Almacen Nucleo', 'Coruscant')
@@ -79,3 +79,16 @@ def test_comandante_adquirir_repuesto():
     assert motor_barato.get_cantidad_disponible() == 0 
 
     assert motor_caro.get_cantidad_disponible() == 4
+    
+'''TEST 6. Comprobar que salta la excepción si el Comandante pide más stock del que hay en toda la galaxia.'''
+def test_comandante_stock_insuficiente():
+    caza = CazaEstelar(id_combate="TIE-01", clave=123, nombre="TIE Fighter", piezas_repuesto=[], dotacion=1)
+    vader = Comandante("Vader", 1234, caza)
+
+    almacen = Almacen('Almacen Borde Exterior', 'Tatooine')
+    motor = Repuesto('Motor Ionico', 'Sienar', 2, 1000) # Solo hay 2
+    almacen.catalogo_repuestos.append(motor)
+    
+    # Vader intenta comprar 50
+    with pytest.raises(ErrorStockInsuficiente):
+        vader.adquirir_repuesto('Motor Ionico', [almacen], 50)
