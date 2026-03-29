@@ -284,7 +284,8 @@ class Operario(UsuarioSistema):
         for repuesto in self.almacen_asignado.catalogo_repuestos:
             if nombre_repuesto == repuesto.get_nombre() and proveedor == repuesto.get_proveedor():
                 repuesto.set_cantidad_disponible(nueva_cantidad) 
-        raise ErrorRepuestoNoEncontrado(f"Fallo en la operación de eliminar: El repuesto '{nombre_repuesto}' no existe en la base de datos del Imperio.")
+                return True
+        raise ErrorRepuestoNoEncontrado(f"Fallo en la operación de modificar: El repuesto '{nombre_repuesto}' no existe en la base de datos del Imperio.")
     
     
     def transferir_repuesto(self, almacen_destino, nombre_repuesto: str, proveedor  : str) :
@@ -297,40 +298,112 @@ class Operario(UsuarioSistema):
                 return True
         raise ErrorRepuestoNoEncontrado(f"Fallo en la operación de eliminar: El repuesto '{nombre_repuesto}' no existe en la base de datos del Imperio.")
     
+# hemos decidido crear un código de prueba con un pelín de ambientración, así se hace más entretenido.
 
-
-
-    
 if __name__ == '__main__':
-    # EJEMPLO DE PRUEBA PARA EL FUNCIONAMIENTO DE LA MAYORÍA DE FUNCIONES DEFINIDAS
-    
-    # BLOQUE DE LAS NAVES
-    unidad_aerea = UnidadesCombateEstelares(id_combate="U-001", clave=1234)
-    caza = Nave(id_combate="N-002", clave=5555, nombre='Caza Moderno',piezas_repuesto=['piston', 'bomba'])
-    estacion = EstacionEspacial(id_combate="E-003", clave=9999, nombre="Estrella de la Muerte", piezas_repuesto=["Láser"], tripulacion=50, pasaje=4, ubicacion=EUbicacion.ENDOR)
+    import time 
 
-    print(f'Prueba unidad aerea: \n id de combate: {unidad_aerea.id_combate}, clave: {unidad_aerea.get_clave()}') # hay que recordar que clave es un atributo privado, sin ayuda del metodo get, obtendriamos error 
-    
-    # BLOQUE DE ALMACEN Y DERIVADS
-    almacen_tatooine = Almacen(nombre="Base Logística Tatooine", localizacion="Borde Exterior")
-    operario = Operario(id_usuario="OP-421", clave_usuario=3333, almacen_asignado=almacen_tatooine)
-    
-    # REPUESTO
-    motor = Repuesto(nombre_repuesto="Motor Iónico", proveedor="Sienar", cantidad_disponible=5, precio=2500.0)
-    
-    print(f"\nOperario {operario.id_usuario} trabajando en el alamcen :  {almacen_tatooine.nombre}")
-    
-    # Veamos algunas de sus funciones
-    operario.añadir_repuesto(motor)
-    print(f"Se ha añadido '{motor.get_nombre()}' al catálogo.")
-    print(f"Stock inicial: {motor.get_cantidad_disponible()} unidades.")
-    
-    
-    operario.modificar_stock(nombre_repuesto="Motor Iónico", nueva_cantidad=50)
-    print(f"Stock tras la actualización del operario: {motor.get_cantidad_disponible()} unidades.")
+    print("\n" + "-"*80)
+    print("TERMINAL DE LOGÍSTICA DEL IMPERIO GALÁCTICO")
+    print("Nivel de Acceso: ALTO MANDO | Encriptación: ACTIVA | Autenticación: OK ")
+    print("-"*80)
 
-    #Porbemos la clase Comandante
-    vader = Comandante(id_usuario="Darth Vader", clave_usuario=0000, nave_asignada=caza)
-    print(f"\nComandante {vader.id_usuario} concetado al software del Imperio Galáctico. Nave asignada: {vader.nave_asignada.nombre}.")
+    # --- ACTO 1: DESPLIEGUE DE LA FLOTA Y MANDOS ---
+    print("\n[FASE 1: Inicializando Activos de la Flota...]")
+    caza_vader = CazaEstelar(id_combate="TIE-ADV-X1", clave=1138, nombre="TIE Advanced", piezas_repuesto=[], dotacion=1)
+    destructor = NaveEstelar(id_combate="SD-EXE", clave=5555, nombre="Ejecutor", piezas_repuesto=[], tripulacion=38000, pasaje=0, clase=EClase.EJECUTOR)
+    estacion = EstacionEspacial(id_combate="DS-1", clave=9999, nombre="Estrella de la Muerte", piezas_repuesto=[], tripulacion=342953, pasaje=843342, ubicacion=EUbicacion.ENDOR)
+
+    print(f" -> {caza_vader.mostrar_especificaciones()}")
+    print(f" -> {destructor.mostrar_especificaciones()}")
+    print(f" -> {estacion.mostrar_especificaciones()}")
+
+    vader = Comandante(id_usuario="Lord Vader", clave_usuario=0000, nave_asignada=caza_vader)
+    tarkin = Comandante(id_usuario="Grand Moff Tarkin", clave_usuario=1111, nave_asignada=estacion)
+
+    # --- ACTO 2: INFRAESTRUCTURA DE ALMACENES Y OPERARIOS ---
+    print("\n[FASE 2: Conectando a la Red de Almacenes...]")
+    almacen_kuat = Almacen(nombre="Astilleros Kuat", localizacion="Mundos del Núcleo")
+    almacen_endor = Almacen(nombre="Base Escudo Endor", localizacion="Borde Exterior")
+    almacen_lothal = Almacen(nombre="Depósito Lothal", localizacion="Territorios del Borde Exterior")
     
+    almacenes_imperio = [almacen_kuat, almacen_endor, almacen_lothal]
+
+    operario_tk421 = Operario(id_usuario="TK-421", clave_usuario=4210, almacen_asignado=almacen_kuat)
+    operario_fn2187 = Operario(id_usuario="FN-2187", clave_usuario=2187, almacen_asignado=almacen_endor)
     
+    print(f" -> {operario_tk421.mostrar_informacion()} [EN LÍNEA]")
+    print(f" -> {operario_fn2187.mostrar_informacion()} [EN LÍNEA]")
+
+    # --- ACTO 3: GESTIÓN MASIVA DE INVENTARIO ---
+    print("\n[FASE 3: Recepción de Cargamento y Logística]")
+    # Creamos un mercado variado para probar a fondo el algoritmo de ordenación por precio
+    m1 = Repuesto("Panel Solar TIE", "Sienar Fleet Systems", 50, 1500) # Calidad media
+    m2 = Repuesto("Panel Solar TIE", "Chatarreros de Jakku", 20, 500)   # Muy barato, mala calidad
+    m3 = Repuesto("Panel Solar TIE", "Kuat Drive Yards", 10, 3000)      # Premiumnm
+    laser = Repuesto("Láser Turboláser", "Sienar Fleet Systems", 5, 12000)
+
+    operario_tk421.añadir_repuesto(m1)
+    operario_tk421.añadir_repuesto(m2)
+    operario_tk421.añadir_repuesto(laser)
+    operario_fn2187.añadir_repuesto(m3)
+    
+    print(" -> Cargamento registrado con éxito en todos los sistemas.")
+
+    print("\n[ALERTA]: ¡Sabotaje Rebelde detectado en Astilleros Kuat!")
+    print(" -> Ajustando inventario de Paneles Solares TIE de Sienar...")
+    operario_tk421.modificar_stock("Panel Solar TIE", "Sienar Fleet Systems", 5) # Pasamos de 50 a solo 5
+    print(" -> Daños evaluados. Stock actualizado de 50 a 5 unidades.")
+
+    # --- ACTO 4: TÁCTICAS DEL ALTO MANDO ---
+    print("\n[FASE 4: Peticiones del Alto Mando]")
+    print(f"[{tarkin.id_usuario}]: 'Verificando defensas de la estación...'")
+    disponible = tarkin.consultar_disponibilidad("Láser Turboláser", almacenes_imperio)
+    if disponible:
+        print(" -> Sistema: Hay Láseres Turboláser disponibles en la red.")
+
+    print(f"\n[{vader.id_usuario}]: 'Necesito 22 Paneles Solares TIE para mi escuadrón. Buscad el mejor precio.'")
+    precio_optimo = vader.consultar_precio("Panel Solar TIE", almacenes_imperio)
+    print(f" -> Sistema Informa: {precio_optimo}")
+
+    print(f"[{vader.id_usuario}]: 'Procedan con la adquisición.'")
+    # Vader necesita 22. El algoritmo debe coger: 20 de Jakku (los más baratos) + 2 de Sienar (los siguientes). Los de Kuat ni los toca.
+    exito = vader.adquirir_repuesto("Panel Solar TIE", almacenes_imperio, cantidad=22)
+    if exito:
+        print(" -> Compra aprobada.")
+        print(f" -> Inventario actual del caza de Vader: {vader.nave_asignada.piezas_repuesto}")
+        
+    print("\n[Auditoría de Stock tras la compra masiva de Lord Vader]:")
+    print(f" - Stock Chatarreros de Jakku (Barato): {m2.get_cantidad_disponible()} unidades (Deberían quedar 0).")
+    print(f" - Stock Sienar Fleet (Medio): {m1.get_cantidad_disponible()} unidades (Deberían quedar 3).")
+    print(f" - Stock Kuat (Caro): {m3.get_cantidad_disponible()} unidades (Deberían quedar intactas las 10).")
+
+    # --- ACTO 5: MANEJO DE EXCEPCIONES CRÍTICAS ---
+    print("\n" + "!"*80)
+    print("SIMULACRO DE ESTRÉS DEL SISTEMA (COMPROBANDO EXCEPCIONES)")
+    print("!"*80)
+
+    # Prueba 1: Eliminar un repuesto que no existe en el catálogo
+    print("\n>> Prueba 1: Operario intenta purgar datos de un Motor hiperimpulsor inexistente...")
+    try:
+        operario_fn2187.eliminar_repuesto("Motor Hiperimpulsor", "Corellian Eng.")
+    except ErrorRepuestoNoEncontrado as e:
+        print(f" [EXCEPCIÓN CONTROLADA] -> {e}")
+
+    # Prueba 2: Comprar algo sin stock suficiente
+    print("\n>> Prueba 2: Tarkin exige 100 Láseres Turboláser (Solo quedan 5)...")
+    try:
+        tarkin.adquirir_repuesto("Láser Turboláser", almacenes_imperio, 100)
+    except ErrorStockInsuficiente as e:
+        print(f" [EXCEPCIÓN CONTROLADA] -> {e}")
+
+    # Prueba 3: Consultar disponibilidad de un mito
+    print("\n>> Prueba 3: Tarkin busca los planos de la Estrella de la Muerte robados...")
+    try:
+        tarkin.consultar_disponibilidad("Planos Estrella de la Muerte", almacenes_imperio)
+    except ErrorRepuestoNoEncontrado as e:
+        print(f" [EXCEPCIÓN CONTROLADA] -> {e}")
+
+    print("\n" + "-"*80)
+    print("SIMULACIÓN FINALIZADA - EL IMPERIO ES AHORA MÁS FUERTE.")
+    print("-"*80 + "\n")
