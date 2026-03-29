@@ -4,7 +4,7 @@ Sistema de gestión de inventario y logística naval desarrollado en Python. Est
 
 ---
 
-## 🚀 Características Principales
+## Características Principales
 
 * **Arquitectura Orientada a Objetos (POO):** Uso de herencia, clases abstractas y polimorfismo para modelar la jerarquía de la flota imperial (`NaveEstelar`, `CazaEstelar`, `EstacionEspacial`).
 * **Algoritmo Voraz (Greedy):** Implementación de un algoritmo de optimización en las compras del Alto Mando. El sistema siempre busca y adquiere primero los repuestos más baratos disponibles en toda la galaxia antes de recurrir a los caros.
@@ -13,7 +13,7 @@ Sistema de gestión de inventario y logística naval desarrollado en Python. Est
 
 ---
 
-## 🏗️ Estructura del Sistema
+## Estructura del Sistema
 
 El proyecto se divide en las siguientes entidades principales:
 
