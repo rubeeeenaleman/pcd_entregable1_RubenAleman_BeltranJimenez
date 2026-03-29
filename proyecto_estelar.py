@@ -299,7 +299,7 @@ class Operario(UsuarioSistema):
         raise ErrorRepuestoNoEncontrado(f"Fallo en la operación de eliminar: El repuesto '{nombre_repuesto}' no existe en la base de datos del Imperio.")
     
 
-if __name__ == '__main__':
+if __name__ == '__main__':  
     # Como el poryecto nos ha parecido muy entrentenido y ambos somos grandes fan de la saga Star Wars, hemos decidio 'dar algo de ambientación' a nuestro 
     # código de prueba
     import time 
